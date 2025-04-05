@@ -1,64 +1,49 @@
-use crate::utils::find_between;
+use crate::utils::{find_between, open_readme, read_file};
+use anyhow::Result;
 use std::{
   fs::File,
-  io::{Read, Write},
+  io::{self, Write},
 };
 
-pub fn run_checks() {
-  // We don't have any checks to run for Kotlin.
-}
-
-fn read_build_gradle_kts() -> String {
-  let mut file = File::open("library/build.gradle.kts").unwrap();
-
-  let mut buffer = String::new();
-  file.read_to_string(&mut buffer).unwrap();
-
-  buffer
-}
-
-fn read_readme() -> String {
-  let mut file = File::open("README.md").unwrap();
-
-  let mut buffer = String::new();
-  file.read_to_string(&mut buffer).unwrap();
-
-  buffer
+pub fn open_build_gradle_kts() -> io::Result<File> {
+  File::open("library/build.gradle.kts")
 }
 
 /// Reads the `library/build.gradle.kts` file and parses it as KTS
 /// and returns the value of the `version` property as string.
-pub fn get_current_version() -> String {
-  let content = read_build_gradle_kts();
+pub fn get_current_version() -> Result<String> {
+  let content = read_file(&mut open_build_gradle_kts()?)?;
 
   // Find the `version = "x.y.z"` line.
   let version_line = content
     .lines()
     .find(|line| line.contains("version"))
-    .expect("'build.gradle.kts' is missing 'version' property.");
+    .ok_or_else(|| anyhow::anyhow!("'build.gradle.kts' is missing 'version' variable."))?;
 
   let version = version_line
     .split("\"")
     .nth(1)
-    .expect("'version' should be wrapped in double quotes.");
+    .ok_or_else(|| anyhow::anyhow!("'build.gradle.kts' is missing 'version' variable."))?;
 
-  version.to_string()
+  Ok(version.to_string())
 }
 
-fn bump_build_gradle_kts(old_version: &str, new_version: &str) {
-  let content = read_build_gradle_kts();
+fn bump_build_gradle_kts(old_version: &str, new_version: &str) -> Result<()> {
+  let mut file = open_build_gradle_kts()?;
+  let content = read_file(&mut file)?;
 
   let from = format!("version = \"{}\"", old_version);
   let to = format!("version = \"{}\"", new_version);
 
   let content = content.replace(&from, &to);
+  file.write_all(content.as_bytes())?;
 
-  let mut file = File::create("library/build.gradle.kts").unwrap();
-  file.write_all(content.as_bytes()).unwrap();
+  Ok(())
 }
 
-fn bump_readme(old_version: &str, new_version: &str) {
-  let content = read_readme();
+fn bump_readme(old_version: &str, new_version: &str) -> Result<()> {
+  let mut file = open_readme()?;
+  let content = read_file(&mut file)?;
   let artifact_id = find_between(&content, "<artifactId>", "</artifactId>");
 
   // replace for maven section
@@ -88,13 +73,17 @@ fn bump_readme(old_version: &str, new_version: &str) {
   );
   let content = content.replace(&from, &to);
 
-  let mut file = File::create("README.md").unwrap();
-  file.write_all(content.as_bytes()).unwrap();
+  // save the file !
+  file.write_all(content.as_bytes())?;
+
+  Ok(())
 }
 
-pub fn bump_version(new_version: &str) {
-  let old_version = get_current_version();
+pub fn bump_version(new_version: &str) -> Result<()> {
+  let old_version = get_current_version()?;
 
-  bump_build_gradle_kts(&old_version, new_version);
-  bump_readme(&old_version, new_version);
+  bump_build_gradle_kts(&old_version, new_version)?;
+  bump_readme(&old_version, new_version)?;
+
+  Ok(())
 }
