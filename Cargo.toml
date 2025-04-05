@@ -1,9 +1,9 @@
 [package]
-name = "quick-release"
+name = "mentor"
 description = "A tool that automatically bumps the version number, creates a tag, pushes the changes, and generates a GitHub release."
 version = "0.1.0"
 authors = ["LiterateInk <contact@literate.ink>"]
-repository = "https://github.com/LiterateInk/QuickRelease"
+repository = "https://github.com/LiterateInk/Mentor"
 edition = "2021"
 license = "MIT"
 
