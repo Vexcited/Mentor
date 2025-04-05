@@ -1,8 +1,8 @@
 # Mentor
 
-A simple CLI tool to quickly release a new version of a LiterateInk library.
+A simple CLI to quickly release a new version.
 
-Of course, this is only useful for LiterateInk libraries and is only meant to be used by the maintainers of the libraries.
+> This tool was intentionally made for LiterateInk repositories but can be used in any repository that follows the same conventions.
 
 ## Motivation
 
@@ -31,7 +31,7 @@ This will create a symlink to the binary in `/usr/local/bin/mentor`, which is in
 
 ## Usage
 
-Be in a LiterateInk repository and you can directly run the command.
+Be in a repository and directly run this command.
 
 ```bash
 mentor
@@ -40,6 +40,8 @@ mentor
 It'll ask you for the type of bump you want for the new version, and then it'll create a new commit and tag and push it to the current branch.
 
 It'll also redirect you to the GitHub page to create a new release with the tag, release name and the release notes - generated using a `git log`.
+
+> By the way, this project itself uses Mentor to release new versions. So, you can see how it works in action.
 
 ## Uninstallation
 
