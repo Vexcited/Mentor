@@ -35,7 +35,8 @@ pub fn bump_version(version: &str) -> Result<()> {
 
   *version_property = toml::Value::String(version.to_string());
 
-  write_file(&mut file, content.to_string())?;
+  let content = toml::to_string(&content)?;
+  write_file(&mut file, content)?;
 
   Ok(())
 }

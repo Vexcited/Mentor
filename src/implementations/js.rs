@@ -70,7 +70,8 @@ pub fn bump_version(version: &str) -> Result<()> {
 
   *version_property = serde_json::Value::String(version.to_string());
 
-  write_file(&mut file, content.to_string())?;
+  let content = serde_json::to_string_pretty(&content)?;
+  write_file(&mut file, content)?;
 
   Ok(())
 }
