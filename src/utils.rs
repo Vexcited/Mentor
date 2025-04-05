@@ -2,6 +2,7 @@ use anyhow::Result;
 use std::{
   fs::{File, OpenOptions},
   io::{self, Read, Write},
+  path::Path,
 };
 
 pub fn find_between(content: &str, start: &str, end: &str) -> String {
@@ -16,6 +17,10 @@ pub fn find_between(content: &str, start: &str, end: &str) -> String {
 
 pub fn open_readme() -> io::Result<File> {
   open_file("README.md")
+}
+
+pub fn file_exists(path: &str) -> bool {
+  Path::new(path).exists()
 }
 
 pub fn open_file(path: &str) -> io::Result<File> {

@@ -2,8 +2,10 @@ use crate::utils::{find_between, open_file, open_readme, read_file, write_file};
 use anyhow::Result;
 use std::{fs::File, io};
 
+pub const BUILD_GRADLE_KTS: &str = "library/build.gradle.kts";
+
 pub fn open_build_gradle_kts() -> io::Result<File> {
-  open_file("library/build.gradle.kts")
+  open_file(BUILD_GRADLE_KTS)
 }
 
 /// Reads the `library/build.gradle.kts` file and parses it as KTS

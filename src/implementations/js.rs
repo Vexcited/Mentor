@@ -36,8 +36,10 @@ pub fn run_checks() -> Result<()> {
   Ok(())
 }
 
+pub const PACKAGE_JSON: &str = "package.json";
+
 pub fn open_package_json() -> io::Result<File> {
-  open_file("package.json")
+  open_file(PACKAGE_JSON)
 }
 
 /// Reads the `package.json` file and parses it as JSON

@@ -2,8 +2,10 @@ use crate::utils::{open_file, read_file, write_file};
 use anyhow::Result;
 use std::{fs::File, io};
 
+pub const CARGO_TOML: &str = "Cargo.toml";
+
 pub fn open_cargo_toml() -> io::Result<File> {
-  open_file("Cargo.toml")
+  open_file(CARGO_TOML)
 }
 
 pub fn get_current_version() -> Result<String> {

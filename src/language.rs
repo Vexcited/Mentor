@@ -1,4 +1,7 @@
-use crate::implementations::{js, kotlin, rust};
+use crate::{
+  implementations::{js, kotlin, rust},
+  utils::file_exists,
+};
 use anyhow::Result;
 use std::fmt;
 
@@ -23,22 +26,16 @@ impl fmt::Display for Language {
 }
 
 pub fn detect_language() -> Result<Language> {
-  if let Ok(file) = js::open_package_json() {
-    if file.metadata().is_ok() {
-      return Ok(Language::JsTs);
-    }
+  if file_exists(js::PACKAGE_JSON) {
+    return Ok(Language::JsTs);
   }
 
-  if let Ok(file) = kotlin::open_build_gradle_kts() {
-    if file.metadata().is_ok() {
-      return Ok(Language::Kotlin);
-    }
+  if file_exists(kotlin::BUILD_GRADLE_KTS) {
+    return Ok(Language::Kotlin);
   }
 
-  if let Ok(file) = rust::open_cargo_toml() {
-    if file.metadata().is_ok() {
-      return Ok(Language::Rust);
-    }
+  if file_exists(rust::CARGO_TOML) {
+    return Ok(Language::Rust);
   }
 
   Err(anyhow::anyhow!(
