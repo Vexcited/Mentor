@@ -25,3 +25,9 @@ pub fn origin_url() -> String {
 
   url.trim().to_string()
 }
+
+pub fn branch_name() -> String {
+  let output = git(&["rev-parse", "--abbrev-ref", "HEAD"]);
+  let branch_name = String::from_utf8_lossy(&output.stdout);
+  branch_name.trim().to_string()
+}
