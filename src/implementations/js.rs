@@ -61,17 +61,21 @@ pub fn get_current_version() -> Result<String> {
 }
 
 /// Edits the `package.json` file and updates the value of the `version` property.
-/// We can't use serde for this as it'll mess up the formatting.
-/// Instead, we manually replace the version in the content.
 pub fn bump_version(version: &str) -> Result<()> {
   let mut file = open_package_json()?;
+
   let content = read_file(&mut file)?;
+  let mut content: serde_json::Value = serde_json::from_str(&content)?;
 
-  let from = format!("\"version\": \"{}\"", get_current_version()?);
-  let to = format!("\"version\": \"{}\"", version);
+  let version_property = content
+    .get_mut("version")
+    .ok_or_else(|| anyhow::anyhow!("'package.json' is missing 'version' property."))?;
 
-  let content = content.replace(&from, &to);
-  file.write_all(content.as_bytes())?;
+  *version_property = serde_json::Value::String(version.to_string());
+
+  file.set_len(0)?;
+  file.write_all(content.to_string().as_bytes())?;
+  file.flush()?;
 
   Ok(())
 }
