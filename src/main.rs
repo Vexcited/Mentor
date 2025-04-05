@@ -19,10 +19,9 @@ use language::{detect_language, Language};
 mod implementations;
 use implementations::js;
 use implementations::kotlin;
+use implementations::rust;
 
-const UNSUPPORTED_LANGUAGE: &str = "unsupported language, make sure to checkout to a valid branch";
-
-fn main() {
+fn main() -> anyhow::Result<()> {
   // Show a warning message, just in case.
   println!("{}\n", "Welcome, please note that this tool is only intended to be used within the LiterateInk organization, since it expects a specific repository structure and provides no way to configure any feature.".yellow());
 
@@ -30,7 +29,7 @@ fn main() {
   // Detect the language of the current implementation.
   //
 
-  let language = detect_language();
+  let language = detect_language()?;
   println!("Automatically detected {language} implementation");
 
   {
@@ -41,9 +40,9 @@ fn main() {
     );
 
     match language {
-      Language::JsTs => js::run_checks(),
-      Language::Kotlin => kotlin::run_checks(),
-      _ => panic!("{UNSUPPORTED_LANGUAGE}"),
+      Language::JsTs => js::run_checks()?,
+      Language::Kotlin => (),
+      Language::Rust => (),
     };
 
     spinner.stop_with_message("Checks are passing, ready to release !".green().to_string());
@@ -54,9 +53,9 @@ fn main() {
   //
 
   let old_version = match language {
-    Language::JsTs => js::get_current_version(),
-    Language::Kotlin => kotlin::get_current_version(),
-    _ => panic!("{UNSUPPORTED_LANGUAGE}"),
+    Language::JsTs => js::get_current_version()?,
+    Language::Kotlin => kotlin::get_current_version()?,
+    Language::Rust => rust::get_current_version()?,
   };
 
   //
@@ -66,9 +65,9 @@ fn main() {
   let new_version = prompt_new_version(&old_version);
 
   match language {
-    Language::JsTs => js::bump_version(&new_version),
-    Language::Kotlin => kotlin::bump_version(&new_version),
-    _ => panic!("{UNSUPPORTED_LANGUAGE}"),
+    Language::JsTs => js::bump_version(&new_version)?,
+    Language::Kotlin => kotlin::bump_version(&new_version)?,
+    _ => unreachable!(),
   }
 
   //
@@ -77,15 +76,15 @@ fn main() {
 
   let commit_message = format!("chore: release v{new_version}");
   let tag_message = format!("Release v{new_version}");
-  let tag_name = format!("{}-v{new_version}", language.to_branch_name());
+  let branch_name = git::branch_name();
 
   let commands = vec![
     // NOTE: not very safe to add everything, might be great in the future to
     // have this as a separate function depending on the language.
     vec!["add", "."],
     vec!["commit", "-m", &commit_message],
-    vec!["tag", "-a", &tag_name, "-m", &tag_message],
-    vec!["push", "origin", language.to_branch_name(), "--tags"],
+    vec!["tag", "-a", &new_version, "-m", &tag_message],
+    vec!["push", "origin", &branch_name, "--tags"],
   ];
 
   for command in commands {
@@ -102,9 +101,11 @@ fn main() {
   //
 
   let release_body = diff(&old_version, &new_version);
-  let release_name = format!("{} v{new_version}", language.to_branch_name());
-  open_create_release(release_body, tag_name, release_name);
+  let release_name = format!("v{new_version}");
+  open_create_release(release_body, new_version, release_name);
 
   // Show an exit message, the CLI has finished its job.
   println!("{}", "Release is now being distributed !".green());
+
+  Ok(())
 }
