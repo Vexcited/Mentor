@@ -1,5 +1,8 @@
 use anyhow::Result;
-use std::{fs::File, io, io::Read};
+use std::{
+  fs::{File, OpenOptions},
+  io::{self, Read, Write},
+};
 
 pub fn find_between(content: &str, start: &str, end: &str) -> String {
   let start_index = content.find(start).unwrap();
@@ -12,7 +15,15 @@ pub fn find_between(content: &str, start: &str, end: &str) -> String {
 }
 
 pub fn open_readme() -> io::Result<File> {
-  File::open("README.md")
+  open_file("README.md")
+}
+
+pub fn open_file(path: &str) -> io::Result<File> {
+  OpenOptions::new()
+    .write(true)
+    .truncate(true)
+    .create(true)
+    .open(path)
 }
 
 pub fn read_file(file: &mut File) -> Result<String> {
@@ -20,4 +31,12 @@ pub fn read_file(file: &mut File) -> Result<String> {
   file.read_to_string(&mut buffer)?;
 
   Ok(buffer)
+}
+
+pub fn write_file(file: &mut File, content: String) -> Result<()> {
+  file.set_len(0)?;
+  file.write_all(content.as_bytes())?;
+  file.flush()?;
+
+  Ok(())
 }

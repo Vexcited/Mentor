@@ -1,12 +1,9 @@
-use crate::utils::{find_between, open_readme, read_file};
+use crate::utils::{find_between, open_file, open_readme, read_file, write_file};
 use anyhow::Result;
-use std::{
-  fs::File,
-  io::{self, Write},
-};
+use std::{fs::File, io};
 
 pub fn open_build_gradle_kts() -> io::Result<File> {
-  File::open("library/build.gradle.kts")
+  open_file("library/build.gradle.kts")
 }
 
 /// Reads the `library/build.gradle.kts` file and parses it as KTS
@@ -37,9 +34,7 @@ fn bump_build_gradle_kts(old_version: &str, new_version: &str) -> Result<()> {
 
   let content = content.replace(&from, &to);
 
-  file.set_len(0)?;
-  file.write_all(content.as_bytes())?;
-  file.flush()?;
+  write_file(&mut file, content)?;
 
   Ok(())
 }
@@ -76,9 +71,7 @@ fn bump_readme(old_version: &str, new_version: &str) -> Result<()> {
   );
   let content = content.replace(&from, &to);
 
-  file.set_len(0)?;
-  file.write_all(content.as_bytes())?;
-  file.flush()?;
+  write_file(&mut file, content)?;
 
   Ok(())
 }

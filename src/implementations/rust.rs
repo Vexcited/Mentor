@@ -1,12 +1,9 @@
-use crate::utils::read_file;
+use crate::utils::{open_file, read_file, write_file};
 use anyhow::Result;
-use std::{
-  fs::File,
-  io::{self, Write},
-};
+use std::{fs::File, io};
 
 pub fn open_cargo_toml() -> io::Result<File> {
-  File::open("Cargo.toml")
+  open_file("Cargo.toml")
 }
 
 pub fn get_current_version() -> Result<String> {
@@ -36,9 +33,7 @@ pub fn bump_version(version: &str) -> Result<()> {
 
   *version_property = toml::Value::String(version.to_string());
 
-  file.set_len(0)?;
-  file.write_all(content.to_string().as_bytes())?;
-  file.flush()?;
+  write_file(&mut file, content.to_string())?;
 
   Ok(())
 }

@@ -1,11 +1,6 @@
+use crate::utils::{open_file, read_file, write_file};
 use anyhow::{Ok, Result};
-use std::{
-  fs::File,
-  io::{self, Write},
-  process::Command,
-};
-
-use crate::utils::read_file;
+use std::{fs::File, io, process::Command};
 
 pub fn run_checks() -> Result<()> {
   // We're checking the code style of the project.
@@ -42,7 +37,7 @@ pub fn run_checks() -> Result<()> {
 }
 
 pub fn open_package_json() -> io::Result<File> {
-  File::open("package.json")
+  open_file("package.json")
 }
 
 /// Reads the `package.json` file and parses it as JSON
@@ -73,9 +68,7 @@ pub fn bump_version(version: &str) -> Result<()> {
 
   *version_property = serde_json::Value::String(version.to_string());
 
-  file.set_len(0)?;
-  file.write_all(content.to_string().as_bytes())?;
-  file.flush()?;
+  write_file(&mut file, content.to_string())?;
 
   Ok(())
 }
