@@ -8,6 +8,7 @@ edition = "2021"
 license = "MIT"
 
 [dependencies]
+anyhow = "1.0.97"
 colored = "2.1"
 dialoguer = "0.11"
 open = "5.3"
