@@ -16,7 +16,7 @@ pub fn get_current_version() -> Result<String> {
   // Find the `version = "x.y.z"` line.
   let version_line = content
     .lines()
-    .find(|line| line.contains("version"))
+    .find(|line| line.contains("version = \""))
     .ok_or_else(|| anyhow::anyhow!("'build.gradle.kts' is missing 'version' variable."))?;
 
   let version = version_line
@@ -34,7 +34,9 @@ fn bump_build_gradle_kts(old_version: &str, new_version: &str) -> Result<()> {
   let from = format!("version = \"{}\"", old_version);
   let to = format!("version = \"{}\"", new_version);
 
-  let content = content.replace(&from, &to);
+  // Replace the first occurrence of the version, since should be
+  // located at the very first lines of the file.
+  let content = content.replacen(&from, &to, 1);
 
   write_file(&mut file, content)?;
 
