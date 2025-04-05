@@ -21,13 +21,15 @@ cargo build --release
 
 ## Installation
 
-You can install it by creating a symlink to the binary in your local bin directory.
-
 ```bash
-sudo ln -s $(pwd)/target/release/mentor /usr/local/bin/mentor
+# If you cloned the repository...
+cargo install --path .
+
+# If you want to install it from GitHub...
+cargo install --git https://github.com/LiterateInk/Mentor
 ```
 
-This will create a symlink to the binary in `/usr/local/bin/mentor`, which is in your PATH, so you can run it from anywhere.
+This will install the `mentor` binary in your `$PATH`.
 
 ## Usage
 
@@ -42,16 +44,6 @@ It'll ask you for the type of bump you want for the new version, and then it'll 
 It'll also redirect you to the GitHub page to create a new release with the tag, release name and the release notes - generated using a `git log`.
 
 > By the way, this project itself uses Mentor to release new versions. So, you can see how it works in action.
-
-## Uninstallation
-
-You can simply remove the symlink created during [Installation](#installation) to uninstall the tool.
-
-```bash
-sudo rm /usr/local/bin/mentor
-```
-
-It doesn't create any other files or directories, so you don't have to worry about that.
 
 ## License
 
