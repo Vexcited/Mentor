@@ -1,7 +1,7 @@
-use std::process::{Command, Output};
 use colored::Colorize;
+use std::process::{Command, Output};
 
-pub fn git (args: &[&str]) -> Output {
+pub fn git(args: &[&str]) -> Output {
   let log = format!("+> git {}", args.join(" "));
   println!("{}", log.bright_black());
 
@@ -12,16 +12,22 @@ pub fn git (args: &[&str]) -> Output {
 }
 
 // get every commit message between the two versions
-pub fn diff (branch_name: &str, old_version: &str, new_version: &str) -> String {
-  let references = format!("{branch_name}-v{old_version}..{branch_name}-v{new_version}");
+pub fn diff(old_version: &str, new_version: &str) -> String {
+  let references = format!("{old_version}..{new_version}");
 
   let output = git(&["log", "--oneline", "--pretty=format:%s (%h)", &references]);
   String::from_utf8_lossy(&output.stdout).to_string()
 }
 
-pub fn origin_url () -> String {
+pub fn origin_url() -> String {
   let output = git(&["remote", "get-url", "origin"]);
   let url = String::from_utf8_lossy(&output.stdout);
 
   url.trim().to_string()
+}
+
+pub fn branch_name() -> String {
+  let output = git(&["rev-parse", "--abbrev-ref", "HEAD"]);
+  let branch_name = String::from_utf8_lossy(&output.stdout);
+  branch_name.trim().to_string()
 }

@@ -1,5 +1,6 @@
+use crate::implementations::{js, kotlin, rust};
+use anyhow::Result;
 use std::fmt;
-use crate::git;
 
 pub enum Language {
   Rust,
@@ -9,42 +10,38 @@ pub enum Language {
 
 impl fmt::Display for Language {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", match self {
-      Self::Rust => "Rust",
-      Self::Kotlin => "Kotlin",
-      Self::JsTs => "JS/TS",     
-    })
+    write!(
+      f,
+      "{}",
+      match self {
+        Self::Rust => "Rust",
+        Self::Kotlin => "Kotlin",
+        Self::JsTs => "JS/TS",
+      }
+    )
   }
 }
 
-impl Language {
-  pub fn from_branch_name (name: &str) -> Self {
-    match name {
-      "js" => Language::JsTs,
-      "rust" => Language::Rust,
-      "kotlin" => Language::Kotlin,
-      _ => panic!("unknown branch, make sure to checkout to a valid branch"),
+pub fn detect_language() -> Result<Language> {
+  if let Ok(file) = js::open_package_json() {
+    if file.metadata().is_ok() {
+      return Ok(Language::JsTs);
     }
   }
 
-  pub fn to_branch_name (&self) -> &str {
-    match self {
-      Language::JsTs => "js",
-      Language::Rust => "rust",
-      Language::Kotlin => "kotlin",
+  if let Ok(file) = kotlin::open_build_gradle_kts() {
+    if file.metadata().is_ok() {
+      return Ok(Language::Kotlin);
     }
   }
-}
 
-pub fn detect_language () -> Language {
-  let output = git(&["rev-parse", "--abbrev-ref", "HEAD"]);
-
-  let branch_name = String::from_utf8_lossy(&output.stdout);
-  let branch_name = branch_name.trim();
-
-  if branch_name == "main" || branch_name == "index" {
-    panic!("you can't release from the primary branch, please checkout to an implementation branch, such as 'js' or 'kotlin'");
+  if let Ok(file) = rust::open_cargo_toml() {
+    if file.metadata().is_ok() {
+      return Ok(Language::Rust);
+    }
   }
 
-  Language::from_branch_name(branch_name)
+  Err(anyhow::anyhow!(
+    "Couldn't detect the language, make sure to checkout to a valid branch."
+  ))
 }
