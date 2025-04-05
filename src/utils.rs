@@ -1,4 +1,4 @@
-pub fn find_between (content: &str, start: &str, end: &str) -> String {
+pub fn find_between(content: &str, start: &str, end: &str) -> String {
   let start_index = content.find(start).unwrap();
   let start_index = start_index + start.len();
 

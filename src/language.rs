@@ -1,5 +1,5 @@
-use std::fmt;
 use crate::git;
+use std::fmt;
 
 pub enum Language {
   Rust,
@@ -9,16 +9,20 @@ pub enum Language {
 
 impl fmt::Display for Language {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-    write!(f, "{}", match self {
-      Self::Rust => "Rust",
-      Self::Kotlin => "Kotlin",
-      Self::JsTs => "JS/TS",     
-    })
+    write!(
+      f,
+      "{}",
+      match self {
+        Self::Rust => "Rust",
+        Self::Kotlin => "Kotlin",
+        Self::JsTs => "JS/TS",
+      }
+    )
   }
 }
 
 impl Language {
-  pub fn from_branch_name (name: &str) -> Self {
+  pub fn from_branch_name(name: &str) -> Self {
     match name {
       "js" => Language::JsTs,
       "rust" => Language::Rust,
@@ -27,7 +31,7 @@ impl Language {
     }
   }
 
-  pub fn to_branch_name (&self) -> &str {
+  pub fn to_branch_name(&self) -> &str {
     match self {
       Language::JsTs => "js",
       Language::Rust => "rust",
@@ -36,7 +40,7 @@ impl Language {
   }
 }
 
-pub fn detect_language () -> Language {
+pub fn detect_language() -> Language {
   let output = git(&["rev-parse", "--abbrev-ref", "HEAD"]);
 
   let branch_name = String::from_utf8_lossy(&output.stdout);

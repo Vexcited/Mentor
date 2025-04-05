@@ -1,11 +1,11 @@
-use spinners::{Spinner, Spinners};
 use colored::Colorize;
+use spinners::{Spinner, Spinners};
 
-mod version;
 mod utils;
+mod version;
 
 mod git;
-use git::{git, diff};
+use git::{diff, git};
 
 mod github;
 use github::open_create_release;
@@ -28,20 +28,24 @@ fn main() {
 
   //
   // Detect the language of the current implementation.
-  // 
+  //
 
   let language = detect_language();
   println!("Automatically detected {language} implementation");
 
-  { // Run checks depending on the language.
-    let mut spinner = Spinner::new(Spinners::Dots, "Running checks for this specific implementation...".into());
-  
+  {
+    // Run checks depending on the language.
+    let mut spinner = Spinner::new(
+      Spinners::Dots,
+      "Running checks for this specific implementation...".into(),
+    );
+
     match language {
       Language::JsTs => js::run_checks(),
       Language::Kotlin => kotlin::run_checks(),
       _ => panic!("{UNSUPPORTED_LANGUAGE}"),
     };
-  
+
     spinner.stop_with_message("Checks are passing, ready to release !".green().to_string());
   }
 
@@ -79,7 +83,6 @@ fn main() {
     // NOTE: not very safe to add everything, might be great in the future to
     // have this as a separate function depending on the language.
     vec!["add", "."],
-
     vec!["commit", "-m", &commit_message],
     vec!["tag", "-a", &tag_name, "-m", &tag_message],
     vec!["push", "origin", language.to_branch_name(), "--tags"],
@@ -94,11 +97,11 @@ fn main() {
     }
   }
 
-  // 
+  //
   // Make a release on GitHub.
   //
 
-  let release_body = diff(language.to_branch_name(), &old_version, &new_version);
+  let release_body = diff(&old_version, &new_version);
   let release_name = format!("{} v{new_version}", language.to_branch_name());
   open_create_release(release_body, tag_name, release_name);
 
