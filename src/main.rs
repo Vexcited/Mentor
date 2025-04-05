@@ -26,24 +26,21 @@ fn main() -> anyhow::Result<()> {
   println!("{}\n", "Welcome, please note that this tool is only intended to be used within the LiterateInk organization, since it expects a specific repository structure and provides no way to configure any feature.".yellow());
 
   //
-  // Detect the language of the current implementation.
+  // Detect the language.
   //
 
   let language = detect_language()?;
-  println!("Automatically detected {language} implementation");
+  println!("Automatically detected language {language}");
 
   {
     // Run checks depending on the language.
-    let mut spinner = Spinner::new(
-      Spinners::Dots,
-      "Running checks for this specific implementation...".into(),
-    );
+    let mut spinner = Spinner::new(Spinners::Dots, "Running checks for this language...".into());
 
     match language {
       Language::JsTs => js::run_checks()?,
       Language::Kotlin => (),
       Language::Rust => (),
-    };
+    }
 
     spinner.stop_with_message("Checks are passing, ready to release !".green().to_string());
   }
@@ -67,7 +64,7 @@ fn main() -> anyhow::Result<()> {
   match language {
     Language::JsTs => js::bump_version(&new_version)?,
     Language::Kotlin => kotlin::bump_version(&new_version)?,
-    _ => unreachable!(),
+    Language::Rust => rust::bump_version(&new_version)?,
   }
 
   //
