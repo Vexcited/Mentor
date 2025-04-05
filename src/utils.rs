@@ -25,8 +25,9 @@ pub fn file_exists(path: &str) -> bool {
 
 pub fn open_file(path: &str) -> io::Result<File> {
   OpenOptions::new()
+    .read(true)
     .write(true)
-    .truncate(true)
+    .truncate(false)
     .create(true)
     .open(path)
 }
