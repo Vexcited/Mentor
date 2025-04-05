@@ -1,6 +1,6 @@
 use crate::utils::{open_file, read_file, write_file};
 use anyhow::Result;
-use std::{fs::File, io};
+use std::{fs::File, io, process::Command};
 
 pub const CARGO_TOML: &str = "Cargo.toml";
 
@@ -37,6 +37,16 @@ pub fn bump_version(version: &str) -> Result<()> {
 
   let content = toml::to_string(&content)?;
   write_file(&mut file, content)?;
+
+  // We have to update the `Cargo.lock` file as well.
+  if !Command::new("cargo")
+    .arg("check")
+    .output()?
+    .status
+    .success()
+  {
+    return Err(anyhow::anyhow!("Failed to update 'Cargo.lock' file."));
+  }
 
   Ok(())
 }
