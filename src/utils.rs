@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::{
   fs::{File, OpenOptions},
-  io::{self, Read, Write},
+  io::{self, Read, Seek, SeekFrom, Write},
   path::Path,
 };
 
@@ -40,7 +40,11 @@ pub fn read_file(file: &mut File) -> Result<String> {
 }
 
 pub fn write_file(file: &mut File, content: String) -> Result<()> {
+  // Move cursor to the beginning.
+  file.seek(SeekFrom::Start(0))?;
   file.set_len(0)?;
+
+  // Write the content to the file.
   file.write_all(content.as_bytes())?;
   file.flush()?;
 
