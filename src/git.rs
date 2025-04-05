@@ -16,7 +16,21 @@ pub fn diff(old_version: &str, new_version: &str) -> String {
   let references = format!("{old_version}..{new_version}");
 
   let output = git(&["log", "--oneline", "--pretty=format:%s (%h)", &references]);
-  String::from_utf8_lossy(&output.stdout).to_string()
+  let output = String::from_utf8_lossy(&output.stdout).to_string();
+
+  let mut lines = output.lines().collect::<Vec<_>>();
+
+  // reverse the lines to get the oldest commit first
+  lines.reverse();
+
+  // remove the last line because it's the version commit
+  lines.pop();
+
+  lines
+    .iter()
+    .map(|line| format!("* {}", line))
+    .collect::<Vec<_>>()
+    .join("\n")
 }
 
 pub fn origin_url() -> String {
