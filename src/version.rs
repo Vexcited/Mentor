@@ -14,7 +14,7 @@ pub fn bump_version(version: &[u8], index: usize) -> Vec<u8> {
     }
     // patch
     2 => version[2] += 1,
-    _ => panic!("invalid prompt selection"),
+    _ => unreachable!(),
   }
 
   version
