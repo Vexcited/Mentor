@@ -36,7 +36,10 @@ fn bump_build_gradle_kts(old_version: &str, new_version: &str) -> Result<()> {
   let to = format!("version = \"{}\"", new_version);
 
   let content = content.replace(&from, &to);
+
+  file.set_len(0)?;
   file.write_all(content.as_bytes())?;
+  file.flush()?;
 
   Ok(())
 }
@@ -73,8 +76,9 @@ fn bump_readme(old_version: &str, new_version: &str) -> Result<()> {
   );
   let content = content.replace(&from, &to);
 
-  // save the file !
+  file.set_len(0)?;
   file.write_all(content.as_bytes())?;
+  file.flush()?;
 
   Ok(())
 }
