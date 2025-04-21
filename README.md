@@ -10,15 +10,6 @@ In some implementations, such as JS, we had custom tools to do this but it was o
 
 So, we created this tool to automate the process without any configuration or setup. It's a simple CLI tool that can be used in any of our library repositories to quickly release a new version.
 
-## Build
-
-You can only install it by building it from source.
-Make sure you have `cargo` and `rust` installed.
-
-```bash
-cargo build --release
-```
-
 ## Installation
 
 ```bash
