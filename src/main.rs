@@ -33,7 +33,6 @@ fn main() -> anyhow::Result<()> {
   println!("Automatically detected language {language}");
 
   {
-    // Run checks depending on the language.
     let mut spinner = Spinner::new(Spinners::Dots, "Running checks for this language...".into());
 
     match language {
@@ -42,7 +41,39 @@ fn main() -> anyhow::Result<()> {
       Language::Rust => (),
     }
 
-    spinner.stop_with_message("Checks are passing, ready to release !".green().to_string());
+    spinner.stop_with_message("Checks are passing.".green().to_string());
+  }
+
+  {
+    let mut spinner = Spinner::new(Spinners::Dots, "Checking repository status...".into());
+
+    // Check if repo is dirty: has uncommitted changes.
+    if git::is_repo_dirty()? {
+      spinner.stop_with_message(
+        "Repository has uncommitted changes. Please commit or stash them first."
+          .red()
+          .to_string(),
+      );
+
+      anyhow::bail!("Repository is dirty");
+    }
+
+    // Check if local is behind remote.
+    let branch_name = git::branch_name();
+    if git::is_behind_upstream(&branch_name)? {
+      spinner.stop_with_message(
+        format!(
+          "Local branch '{}' is behind its remote. Please pull changes first.",
+          branch_name
+        )
+        .red()
+        .to_string(),
+      );
+
+      anyhow::bail!("Repository is not up to date with remote");
+    }
+
+    spinner.stop_with_message("Repository is clean and up to date.".green().to_string());
   }
 
   //
@@ -76,9 +107,7 @@ fn main() -> anyhow::Result<()> {
   let branch_name = git::branch_name();
 
   let commands = vec![
-    // NOTE: not very safe to add everything, might be great in the future to
-    // have this as a separate function depending on the language.
-    vec!["add", "."],
+    vec!["add", "-A"],
     vec!["commit", "-m", &commit_message],
     vec!["tag", "-a", &new_version, "-m", &tag_message],
     vec!["push", "origin", &branch_name, "--tags"],
@@ -88,8 +117,8 @@ fn main() -> anyhow::Result<()> {
     let output = git(&command);
 
     if !output.status.success() {
-      let error = String::from_utf8_lossy(&output.stdout);
-      panic!("{error}");
+      let error = String::from_utf8_lossy(&output.stderr);
+      anyhow::bail!("{error}");
     }
   }
 

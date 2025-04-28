@@ -1,3 +1,4 @@
+use anyhow::Result;
 use colored::Colorize;
 use std::process::{Command, Output};
 
@@ -44,4 +45,38 @@ pub fn branch_name() -> String {
   let output = git(&["rev-parse", "--abbrev-ref", "HEAD"]);
   let branch_name = String::from_utf8_lossy(&output.stdout);
   branch_name.trim().to_string()
+}
+
+pub fn is_repo_dirty() -> Result<bool> {
+  let output = git(&["status", "--porcelain"]);
+
+  if !output.status.success() {
+    return Err(anyhow::anyhow!("failed to check repository status"));
+  }
+
+  // If there's any output, the repo is dirty
+  Ok(!output.stdout.is_empty())
+}
+
+pub fn is_behind_upstream(branch_name: &str) -> Result<bool> {
+  let fetch = git(&["fetch"]);
+  if !fetch.status.success() {
+    return Err(anyhow::anyhow!("failed to fetch from remote"));
+  }
+
+  let upstream = format!("origin/{}", branch_name);
+  let output = git(&["rev-list", "--count", &format!("HEAD..{}", upstream)]);
+
+  if !output.status.success() {
+    return Err(anyhow::anyhow!(
+      "failed to check if branch is behind remote"
+    ));
+  }
+
+  let behind_count = String::from_utf8_lossy(&output.stdout)
+    .trim()
+    .parse::<u32>()
+    .unwrap_or(0);
+
+  Ok(behind_count > 0)
 }
