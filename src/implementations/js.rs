@@ -98,6 +98,10 @@ pub fn bump_version(version: &str) -> Result<()> {
   *version_property = serde_json::Value::String(version.to_string());
 
   let content = serde_json::to_string_pretty(&content)?;
+
+  // Add a newline at the end of the file, to avoid issue with eslint !
+  let content = content + "\n";
+
   write_file(&mut file, content)?;
 
   Ok(())
