@@ -99,6 +99,12 @@ fn main() -> anyhow::Result<()> {
   }
 
   //
+  // Delete previous tag, if exists.
+  //
+
+  _ = git(&["tag", "-d", &new_version]);
+
+  //
   // Commit, tag and push to origin.
   //
 
