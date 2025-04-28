@@ -12,10 +12,10 @@ features = ["preserve_order"]
 version = "1.0"
 
 [package]
-authors = ["LiterateInk <contact@literate.ink>"]
+authors = ["Mikkel ALMONTE--RINGAUD <contact@vexcited.com>"]
 description = "A tool that automatically bumps the version number, creates a tag, pushes the changes, and generates a GitHub release."
 edition = "2021"
 license = "MIT"
 name = "mentor"
-repository = "https://github.com/LiterateInk/Mentor"
+repository = "https://github.com/Vexcited/Mentor"
 version = "0.3.2"

@@ -1,26 +1,12 @@
 # Mentor
 
-A simple CLI to quickly release a new version.
-
-> This tool was intentionally made for LiterateInk repositories but can be used in any repository that follows the same conventions.
-
-## Motivation
-
-In some implementations, such as JS, we had custom tools to do this but it was only bound to that specific implementation. For example, `release-it` for the JS implementation. But, I wanted a tool that could be used in any implementation without doing any extra config, work or setup.
-
-So, we created this tool to automate the process without any configuration or setup. It's a simple CLI tool that can be used in any of our library repositories to quickly release a new version.
+A very opinionated CLI to quickly release a new version for any GitHub repository.
 
 ## Installation
 
 ```bash
-# If you cloned the repository...
-cargo install --path .
-
-# If you want to install it from GitHub...
-cargo install --git https://github.com/LiterateInk/Mentor
+cargo install --git https://github.com/Vexcited/Mentor
 ```
-
-This will install the `mentor` binary in your `$PATH`.
 
 ## Usage
 
