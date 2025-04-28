@@ -5,7 +5,11 @@ use std::{fs::File, io, path::Path, process::Command};
 fn detect_package_manager() -> Result<String> {
   // As of right now, we only support bun and pnpm.
   // Adding support for yarn and npm is not a priority right now...
-  let lockfiles = [("bun.lockb", "bun"), ("pnpm-lock.yaml", "pnpm")];
+  let lockfiles = [
+    ("bun.lock", "bun"),
+    ("bun.lockb", "bun"),
+    ("pnpm-lock.yaml", "pnpm"),
+  ];
 
   for (lockfile, package_manager) in lockfiles.iter() {
     if Path::new(lockfile).exists() {
