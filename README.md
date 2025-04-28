@@ -8,6 +8,14 @@ A very opinionated CLI to quickly release a new version for any GitHub repositor
 cargo install --git https://github.com/Vexcited/Mentor
 ```
 
+## Features
+
+- Supports Rust, Kotlin (gradle.kts only) and JavaScript/TypeScript (pnpm and bun only)
+- Run specific checks depending on the language
+- Checks repository state (whether is behind remote or dirty)
+- Automatically bumps the version in every files
+- Opens a GitHub release link with changelog generated with `git log`
+
 ## Usage
 
 Be in a repository and directly run this command.
