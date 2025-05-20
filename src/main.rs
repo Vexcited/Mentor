@@ -22,9 +22,6 @@ use implementations::kotlin;
 use implementations::rust;
 
 fn main() -> anyhow::Result<()> {
-  // Show a warning message, just in case.
-  println!("{}\n", "Welcome, please note that this tool is only intended to be used within the LiterateInk organization, since it expects a specific repository structure and provides no way to configure any feature.".yellow());
-
   //
   // Detect the language.
   //
