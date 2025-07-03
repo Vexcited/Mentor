@@ -13,7 +13,12 @@ fn detect_package_manager() -> Result<String> {
 
   for (lockfile, package_manager) in lockfiles.iter() {
     if Path::new(lockfile).exists() {
-      return Ok(package_manager.to_string());
+      let package_manager = package_manager.to_string();
+
+      #[cfg(windows)]
+      let package_manager = format!("{package_manager}.cmd");
+
+      return Ok(package_manager);
     }
   }
 
