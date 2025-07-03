@@ -16,7 +16,15 @@ fn detect_package_manager() -> Result<String> {
       let package_manager = package_manager.to_string();
 
       #[cfg(windows)]
-      let package_manager = format!("{package_manager}.cmd");
+      let package_manager = format!(
+        "{package_manager}{}",
+        if package_manager == "pnpm" {
+          ".cmd"
+        }
+        else {
+          ""
+        }
+      );
 
       return Ok(package_manager);
     }
