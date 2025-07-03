@@ -29,7 +29,7 @@ pub fn diff(old_version: &str, new_version: &str) -> String {
 
   lines
     .iter()
-    .map(|line| format!("* {}", line))
+    .map(|line| format!("* {line}"))
     .collect::<Vec<_>>()
     .join("\n")
 }
@@ -64,8 +64,8 @@ pub fn is_behind_upstream(branch_name: &str) -> Result<bool> {
     return Err(anyhow::anyhow!("failed to fetch from remote"));
   }
 
-  let upstream = format!("origin/{}", branch_name);
-  let output = git(&["rev-list", "--count", &format!("HEAD..{}", upstream)]);
+  let upstream = format!("origin/{branch_name}");
+  let output = git(&["rev-list", "--count", &format!("HEAD..{upstream}")]);
 
   if !output.status.success() {
     return Err(anyhow::anyhow!(

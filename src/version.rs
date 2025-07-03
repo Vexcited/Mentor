@@ -31,6 +31,6 @@ pub fn version_to_string(version: Vec<u8>) -> String {
 pub fn string_to_version(version: &str) -> Vec<u8> {
   version
     .split(".")
-    .map(|part| part.parse().unwrap())
+    .map(|part| part.parse::<u8>().unwrap())
     .collect()
 }

@@ -31,8 +31,8 @@ fn bump_build_gradle_kts(old_version: &str, new_version: &str) -> Result<()> {
   let mut file = open_build_gradle_kts()?;
   let content = read_file(&mut file)?;
 
-  let from = format!("version = \"{}\"", old_version);
-  let to = format!("version = \"{}\"", new_version);
+  let from = format!("version = \"{old_version}\"");
+  let to = format!("version = \"{new_version}\"");
 
   // Replace the first occurrence of the version, since should be
   // located at the very first lines of the file.
@@ -49,30 +49,18 @@ fn bump_readme(old_version: &str, new_version: &str) -> Result<()> {
   let artifact_id = find_between(&content, "<artifactId>", "</artifactId>");
 
   // replace for maven section
-  let from = format!("<version>{}</version>", old_version);
-  let to = format!("<version>{}</version>", new_version);
+  let from = format!("<version>{old_version}</version>");
+  let to = format!("<version>{new_version}</version>");
   let content = content.replace(&from, &to);
 
   // replace for gradle (kotlin) section
-  let from = format!(
-    "implementation(\"ink.literate:{artifact_id}:{}\")",
-    old_version
-  );
-  let to = format!(
-    "implementation(\"ink.literate:{artifact_id}:{}\")",
-    new_version
-  );
+  let from = format!("implementation(\"ink.literate:{artifact_id}:{old_version}\")");
+  let to = format!("implementation(\"ink.literate:{artifact_id}:{new_version}\")");
   let content = content.replace(&from, &to);
 
   // replace for gradle section
-  let from = format!(
-    "implementation 'ink.literate:{artifact_id}:{}'",
-    old_version
-  );
-  let to = format!(
-    "implementation 'ink.literate:{artifact_id}:{}'",
-    new_version
-  );
+  let from = format!("implementation 'ink.literate:{artifact_id}:{old_version}'");
+  let to = format!("implementation 'ink.literate:{artifact_id}:{new_version}'");
   let content = content.replace(&from, &to);
 
   write_file(&mut file, content)?;

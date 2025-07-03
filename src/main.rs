@@ -59,12 +59,9 @@ fn main() -> anyhow::Result<()> {
     let branch_name = git::branch_name();
     if git::is_behind_upstream(&branch_name)? {
       spinner.stop_with_message(
-        format!(
-          "Local branch '{}' is behind its remote. Please pull changes first.",
-          branch_name
-        )
-        .red()
-        .to_string(),
+        format!("Local branch '{branch_name}' is behind its remote. Please pull changes first.",)
+          .red()
+          .to_string(),
       );
 
       anyhow::bail!("Repository is not up to date with remote");
