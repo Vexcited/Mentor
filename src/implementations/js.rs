@@ -1,6 +1,13 @@
 use crate::utils::{open_file, read_file, write_file};
 use anyhow::{Ok, Result};
-use std::{fs::File, io, path::Path, process::Command};
+use regex::Regex;
+use std::{
+  env::current_dir,
+  fs::{read_dir, File},
+  io,
+  path::Path,
+  process::Command,
+};
 
 fn detect_package_manager() -> Result<String> {
   // As of right now, we only support bun and pnpm.
@@ -20,8 +27,7 @@ fn detect_package_manager() -> Result<String> {
         "{package_manager}{}",
         if package_manager == "pnpm" {
           ".cmd"
-        }
-        else {
+        } else {
           ""
         }
       );
@@ -31,6 +37,44 @@ fn detect_package_manager() -> Result<String> {
   }
 
   Err(anyhow::anyhow!("no lockfile found"))
+}
+
+/// Looking up for tests files according to Bun defaults.
+/// https://bun.com/docs/cli/test#run-tests
+fn has_test_files(dir: &Path) -> Result<bool> {
+  let test_patterns = vec![
+    Regex::new(r".*\.test\.(js|jsx|ts|tsx)$")?,
+    Regex::new(r".*_test\.(js|jsx|ts|tsx)$")?,
+    Regex::new(r".*\.spec\.(js|jsx|ts|tsx)$")?,
+    Regex::new(r".*_spec\.(js|jsx|ts|tsx)$")?,
+  ];
+
+  fn check_directory(dir: &Path, patterns: &[Regex]) -> Result<bool> {
+    let entries = read_dir(dir)?;
+
+    for entry in entries {
+      let entry = entry?;
+      let path = entry.path();
+
+      if path.is_dir() {
+        if check_directory(&path, patterns)? {
+          return Ok(true);
+        }
+      } else if path.is_file() {
+        if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
+          for pattern in patterns {
+            if pattern.is_match(filename) {
+              return Ok(true);
+            }
+          }
+        }
+      }
+    }
+
+    Ok(false)
+  }
+
+  check_directory(dir, &test_patterns)
 }
 
 pub fn run_checks() -> Result<()> {
@@ -62,14 +106,18 @@ pub fn run_checks() -> Result<()> {
   // We check the tests of a project, only if the package manager is bun
   // since it has a built-in test runner.
   if package_manager == "bun" {
-    // We're checking the tests of the project.
-    let output = Command::new(&package_manager).arg("test").output()?;
+    let current_dir = current_dir()?;
 
-    if !output.status.success() {
-      let error = String::from_utf8_lossy(&output.stdout);
-      return Err(anyhow::anyhow!(
-        "failed to pass tests, see the following stack trace:\n\n{error}"
-      ));
+    if has_test_files(&current_dir)? {
+      // We're checking the tests of the project.
+      let output = Command::new(&package_manager).arg("test").output()?;
+
+      if !output.status.success() {
+        let error = String::from_utf8_lossy(&output.stdout);
+        return Err(anyhow::anyhow!(
+          "failed to pass tests, see the following stack trace:\n\n{error}"
+        ));
+      }
     }
   }
 
