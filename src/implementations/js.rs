@@ -55,15 +55,23 @@ fn has_test_files(dir: &Path) -> Result<bool> {
     for entry in entries {
       let entry = entry?;
       let path = entry.path();
+      let name = path.file_name().and_then(|n| n.to_str());
 
       if path.is_dir() {
+        if let Some(dir_name) = name {
+          if matches!(dir_name, "node_modules" | ".git" | "dist") {
+            continue;
+          }
+        }
+
         if check_directory(&path, patterns)? {
           return Ok(true);
         }
       } else if path.is_file() {
-        if let Some(filename) = path.file_name().and_then(|n| n.to_str()) {
+        if let Some(filename) = name {
           for pattern in patterns {
             if pattern.is_match(filename) {
+              println!("found {filename}");
               return Ok(true);
             }
           }
