@@ -10,11 +10,14 @@ cargo install --git https://github.com/Vexcited/Mentor
 
 ## Features
 
-- Supports Rust, Kotlin (gradle.kts only) and JavaScript/TypeScript (pnpm and bun only)
+- Supports Rust, Swift, Kotlin and JS/TS (`pnpm` and `bun` only)
 - Run specific checks depending on the language
 - Checks repository state (whether is behind remote or dirty)
 - Automatically bumps the version in every files
 - Opens a GitHub release link with changelog generated with `git log`
+
+Please, look at the wiki to know the exact configuration your repository must
+have for this tool to work correctly.
 
 ## Usage
 

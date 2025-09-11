@@ -1,5 +1,5 @@
 use crate::{
-  implementations::{js, kotlin, rust},
+  implementations::{js, kotlin, rust, swift},
   utils::file_exists,
 };
 use anyhow::Result;
@@ -9,6 +9,7 @@ pub enum Language {
   Rust,
   Kotlin,
   JsTs,
+  Swift,
 }
 
 impl fmt::Display for Language {
@@ -20,6 +21,7 @@ impl fmt::Display for Language {
         Self::Rust => "Rust",
         Self::Kotlin => "Kotlin",
         Self::JsTs => "JS/TS",
+        Self::Swift => "Swift",
       }
     )
   }
@@ -38,7 +40,11 @@ pub fn detect_language() -> Result<Language> {
     return Ok(Language::Rust);
   }
 
+  if file_exists(swift::PACKAGE_SWIFT) {
+    return Ok(Language::Swift);
+  }
+
   Err(anyhow::anyhow!(
-    "Couldn't detect the language, make sure to checkout to a valid branch."
+    "couldn't detect the language, probably not supported"
   ))
 }

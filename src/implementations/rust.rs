@@ -45,7 +45,7 @@ pub fn bump_version(version: &str) -> Result<()> {
     .status
     .success()
   {
-    return Err(anyhow::anyhow!("Failed to update 'Cargo.lock' file."));
+    return Err(anyhow::anyhow!("failed to update lockfile"));
   }
 
   Ok(())

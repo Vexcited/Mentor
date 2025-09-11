@@ -20,6 +20,7 @@ mod implementations;
 use implementations::js;
 use implementations::kotlin;
 use implementations::rust;
+use implementations::swift;
 
 fn main() -> anyhow::Result<()> {
   //
@@ -36,6 +37,7 @@ fn main() -> anyhow::Result<()> {
       Language::JsTs => js::run_checks()?,
       Language::Kotlin => (),
       Language::Rust => (),
+      Language::Swift => (), // TODO: run `swift test`
     }
 
     spinner.stop_with_message("Checks are passing.".green().to_string());
@@ -78,6 +80,7 @@ fn main() -> anyhow::Result<()> {
     Language::JsTs => js::get_current_version()?,
     Language::Kotlin => kotlin::get_current_version()?,
     Language::Rust => rust::get_current_version()?,
+    Language::Swift => swift::get_current_version(),
   };
 
   //
@@ -90,6 +93,7 @@ fn main() -> anyhow::Result<()> {
     Language::JsTs => js::bump_version(&new_version)?,
     Language::Kotlin => kotlin::bump_version(&new_version)?,
     Language::Rust => rust::bump_version(&new_version)?,
+    Language::Swift => (), // TODO: check README and update
   }
 
   //
