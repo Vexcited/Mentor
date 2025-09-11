@@ -112,7 +112,7 @@ fn main() -> anyhow::Result<()> {
 
   let commands = vec![
     vec!["add", "-A"],
-    vec!["commit", "-m", &commit_message],
+    vec!["commit", "--allow-empty", "-m", &commit_message],
     vec!["tag", "-a", &new_version, "-m", &tag_message],
     vec!["push", "origin", &branch_name, "--tags"],
   ];
