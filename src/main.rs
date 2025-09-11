@@ -121,8 +121,9 @@ fn main() -> anyhow::Result<()> {
     let output = git(&command);
 
     if !output.status.success() {
-      let error = String::from_utf8_lossy(&output.stderr);
-      anyhow::bail!("{error}");
+      let stdout = String::from_utf8_lossy(&output.stdout);
+      let stderr = String::from_utf8_lossy(&output.stderr);
+      anyhow::bail!("stdout: {stdout} / stderr: {stderr}");
     }
   }
 
