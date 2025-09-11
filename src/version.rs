@@ -34,3 +34,6 @@ pub fn string_to_version(version: &str) -> Vec<u8> {
     .map(|part| part.parse::<u8>().unwrap())
     .collect()
 }
+
+/// Whenever the project has no version so we default on this version.
+pub const DEFAULT: &str = "0.0.0";
