@@ -80,3 +80,11 @@ pub fn is_behind_upstream(branch_name: &str) -> Result<bool> {
 
   Ok(behind_count > 0)
 }
+
+/// Get all tags of the repository, latest first to oldest tag.
+pub fn tags() -> Vec<String> {
+  let output = git(&["tag", "--sort=-v:refname"]);
+  let output = String::from_utf8_lossy(&output.stdout).to_string();
+
+  output.lines().map(|line| line.into()).collect::<Vec<_>>()
+}
