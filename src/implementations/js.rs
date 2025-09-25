@@ -18,21 +18,36 @@ fn detect_package_manager() -> Result<String> {
     ("pnpm-lock.yaml", "pnpm"),
   ];
 
-  for (lockfile, package_manager) in lockfiles.iter() {
-    if Path::new(lockfile).exists() {
-      let package_manager = package_manager.to_string();
+  // Start from current directory and walk up the parent directories.
+  let mut current_path = current_dir()?;
 
-      #[cfg(windows)]
-      let package_manager = format!(
-        "{package_manager}{}",
-        if package_manager == "pnpm" {
-          ".cmd"
-        } else {
-          ""
-        }
-      );
+  loop {
+    for (lockfile, package_manager) in lockfiles.iter() {
+      let lockfile_path = current_path.join(lockfile);
+      if lockfile_path.exists() {
+        let package_manager = package_manager.to_string();
 
-      return Ok(package_manager);
+        #[cfg(windows)]
+        let package_manager = format!(
+          "{package_manager}{}",
+          if package_manager == "pnpm" {
+            ".cmd"
+          }
+          else {
+            ""
+          }
+        );
+
+        return Ok(package_manager);
+      }
+    }
+
+    // Move to parent directory, or break if we've reached the root: found nothing...
+    if let Some(parent) = current_path.parent() {
+      current_path = parent.to_path_buf();
+    }
+    else {
+      break;
     }
   }
 
@@ -67,7 +82,8 @@ fn has_test_files(dir: &Path) -> Result<bool> {
         if check_directory(&path, patterns)? {
           return Ok(true);
         }
-      } else if path.is_file() {
+      }
+      else if path.is_file() {
         if let Some(filename) = name {
           for pattern in patterns {
             if pattern.is_match(filename) {
