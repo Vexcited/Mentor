@@ -93,7 +93,7 @@ fn main() -> anyhow::Result<()> {
     Language::JsTs => js::bump_version(&new_version)?,
     Language::Kotlin => kotlin::bump_version(&new_version)?,
     Language::Rust => rust::bump_version(&new_version)?,
-    Language::Swift => (), // TODO: check README and update
+    Language::Swift => swift::bump_version(&new_version)?,
   }
 
   //
