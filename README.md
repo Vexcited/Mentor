@@ -5,7 +5,7 @@ A very opinionated CLI to quickly release a new version for any GitHub repositor
 ## Installation
 
 ```bash
-cargo install --git https://github.com/Vexcited/Mentor
+cargo install --git https://seed.vexcited.com/z3e8pGGtpvezpTJRJqbWb8Ktt7y61.git
 ```
 
 ## Features
